@@ -143,3 +143,18 @@ add_plugin(mfrtaa
         ${mfrtaa_source}/PluginProcessor.cpp
     INCLUDE_DIRS
         ${mfrtaa_source})
+
+# Add ring modulator plugin
+set(ring_modulator_source ${CMAKE_CURRENT_SOURCE_DIR}/projects/RingModulatorPlugin)
+
+add_plugin(ring_modulator
+    VERSION 0.1.0
+    PLUGIN_NAME "Ring Modulator"
+    PROD_NAME RingModulator
+    PROD_CODE Rmta
+    SYNTH FALSE
+    SOURCES
+        ${ring_modulator_source}/PluginEditor.cpp
+        ${ring_modulator_source}/PluginProcessor.cpp
+    INCLUDE_DIRS
+        ${ring_modulator_source})
