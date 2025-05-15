@@ -158,3 +158,19 @@ add_plugin(ring_modulator
         ${ring_modulator_source}/PluginProcessor.cpp
     INCLUDE_DIRS
         ${ring_modulator_source})
+
+
+# Add ring modulator plugin
+set(modulated_delay_source ${CMAKE_CURRENT_SOURCE_DIR}/projects/ModulatedDelayPlugin)
+
+add_plugin(modulated_delay
+    VERSION 0.1.0
+    PLUGIN_NAME "Moduled Delay"
+    PROD_NAME ModulatedDelay
+    PROD_CODE Mota
+    SYNTH FALSE
+    SOURCES
+        ${modulated_delay_source}/PluginEditor.cpp
+        ${modulated_delay_source}/PluginProcessor.cpp
+    INCLUDE_DIRS
+        ${modulated_delay_source})
