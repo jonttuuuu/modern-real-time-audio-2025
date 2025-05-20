@@ -8,7 +8,11 @@ static const std::vector<mrta::ParameterInfo> ParameterInfos
 };
 
 MainProcessor::MainProcessor() :
-    parameterManager(*this, ProjectInfo::projectName, ParameterInfos), phase(0.0f)
+    parameterManager(*this, ProjectInfo::projectName, ParameterInfos), 
+    frequency(1000.0f),
+    phase(0.0f),
+    modulationEnabled(true),
+    sampleRate(44100.0)
 {
     parameterManager.registerParameterCallback(Param::ID::ModulationEnabled,
     [this] (float value, bool /*forced*/)
@@ -32,6 +36,8 @@ MainProcessor::~MainProcessor()
 void MainProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     juce::uint32 numChannels { static_cast<juce::uint32>(std::max(getMainBusNumInputChannels(), getMainBusNumOutputChannels())) };
+    this->sampleRate = sampleRate;
+    phase = 0.0f; // Reset phase when playback starts
     parameterManager.updateParameters(true);
 }
 
@@ -39,19 +45,27 @@ void MainProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuf
 {
     juce::ScopedNoDenormals noDenormals;
     parameterManager.updateParameters();
-    if (!modulationEnabled) return;
+    
+    if (!modulationEnabled) 
+        return; // Simply pass through audio when disabled
 
-    float phaseIncrement = 2.0f * juce::MathConstants<float>::pi * frequency / getSampleRate();
+    // Calculate phase increment based on current frequency and sample rate
+    // This determines how quickly we move through the modulation waveform
+    float phaseIncrement = 2.0f * juce::MathConstants<float>::pi * frequency / sampleRate;
 
     for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
     {
         float* samples = buffer.getWritePointer(channel);
         for (int i = 0; i < buffer.getNumSamples(); ++i)
         {
+            // Standard ring modulation: multiply input by carrier (cosine)
             samples[i] *= std::cos(phase);
 
+            // Advance phase for next sample
             phase += phaseIncrement;
-            if (phase > 2.0f * juce::MathConstants<float>::pi)
+            
+            // Keep phase in the range of [0, 2π] to prevent floating point errors
+            if (phase >= 2.0f * juce::MathConstants<float>::pi)
                 phase -= 2.0f * juce::MathConstants<float>::pi;
         }
     }

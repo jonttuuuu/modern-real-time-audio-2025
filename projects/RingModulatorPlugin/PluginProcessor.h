@@ -52,6 +52,7 @@ private:
     float frequency;
     float phase;
     bool modulationEnabled;
+    double sampleRate;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainProcessor)
 };

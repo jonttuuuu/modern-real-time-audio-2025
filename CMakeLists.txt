@@ -160,7 +160,7 @@ add_plugin(ring_modulator
         ${ring_modulator_source})
 
 
-# Add ring modulator plugin
+# Add modulated delay plugin
 set(modulated_delay_source ${CMAKE_CURRENT_SOURCE_DIR}/projects/ModulatedDelayPlugin)
 
 add_plugin(modulated_delay
@@ -174,3 +174,18 @@ add_plugin(modulated_delay
         ${modulated_delay_source}/PluginProcessor.cpp
     INCLUDE_DIRS
         ${modulated_delay_source})
+
+# Add subtractive synthesizer plugin
+set(subtractive_synth_source ${CMAKE_CURRENT_SOURCE_DIR}/projects/SubtractiveSynthesizer)
+
+add_plugin(subtractive_synth
+    VERSION 0.1.0
+    PLUGIN_NAME "Subtractive Synthesizer"
+    PROD_NAME SubtractiveSynth
+    PROD_CODE Sbsy
+    SYNTH TRUE
+    SOURCES
+        ${subtractive_synth_source}/PluginEditor.cpp
+        ${subtractive_synth_source}/PluginProcessor.cpp
+    INCLUDE_DIRS
+        ${subtractive_synth_source})
