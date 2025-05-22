@@ -10,7 +10,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout(const 
         {
             case mrta::ParameterInfo::Float:
             {
-                layout.add(std::make_unique<juce::AudioParameterFloat>(info.ID, info.name,
+                layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { info.ID, 1 }, info.name,
                                                                        juce::NormalisableRange<float>(info.min, info.max, info.inc, info.skw),
                                                                        info.def,
                                                                        juce::AudioParameterFloatAttributes().withLabel(info.unit)));
@@ -19,7 +19,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout(const 
 
             case mrta::ParameterInfo::Choice:
             {
-                layout.add(std::make_unique<juce::AudioParameterChoice>(info.ID, info.name, info.steps, static_cast<int>(info.def)));
+                layout.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID { info.ID, 1 }, info.name, info.steps, static_cast<int>(info.def)));
             }
             break;
 
@@ -38,7 +38,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout(const 
                                                                                                  if (trueLabel.compare(text) == 0) return true;
                                                                                                  return false;
                                                                                              });
-                layout.add(std::make_unique<juce::AudioParameterBool>(info.ID, info.name, static_cast<bool>(info.def), attr));
+                layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID { info.ID, 1 }, info.name, static_cast<bool>(info.def), attr));
             }
             break;
 
