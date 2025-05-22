@@ -32,11 +32,10 @@ public:
         memset(bias_output, 0, sizeof(bias_output));
 
         reset_state();
-    }
-
-    float sigmoid(float x) const
+    }    float sigmoid(float x) const
     {
-        // TODO 1) Implement the sigmoid function
+        // Sigmoid function: σ(x) = 1 / (1 + e^(-x))
+        return 1.0f / (1.0f + std::exp(-x));
     }
 
     void process(float * const * output, const float * const * input, size_t num_samples)
@@ -53,13 +52,16 @@ public:
             {
                 // Initialise with bias_ih
                 r_gate[i] = bias_ih_r[i];
+                
                 // Implement matrix-vector multiply with weight_ih and the input signal
                 for (size_t j = 0; j < INPUT_SIZE; ++j)
                 {
                     r_gate[i] += weight_ih_r[i][j] * input[n][j];
                 }
+                
                 // Add bias_hh
                 r_gate[i] += bias_hh_r[i];
+                
                 // Implement matrix-vector multiply with weight_hh and the state signal
                 for (size_t j = 0; j < HIDDEN_SIZE; ++j)
                 {
@@ -68,30 +70,73 @@ public:
                 // Apply sigmoid activation function
                 r_gate[i] = sigmoid(r_gate[i]);
             }
-
-            // TODO 2) Implement the z gate and store the result to z_gate.
+            
+            // Implement the z gate and store the result to z_gate (similar to r_gate implementation)
             for (size_t i = 0; i < HIDDEN_SIZE; ++i)
             {
+                // Initialize with bias_ih_z
+                z_gate[i] = bias_ih_z[i];
+                
+                // Matrix-vector multiply with weight_ih_z and the input signal
+                for (size_t j = 0; j < INPUT_SIZE; ++j)
+                {
+                    z_gate[i] += weight_ih_z[i][j] * input[n][j];
+                }
+                
+                // Add bias_hh_z
+                z_gate[i] += bias_hh_z[i];
+                
+                // Matrix-vector multiply with weight_hh_z and the state signal
+                for (size_t j = 0; j < HIDDEN_SIZE; ++j)
+                {
+                    z_gate[i] += weight_hh_z[i][j] * state[j];
+                }
+                // Apply sigmoid activation function
+                z_gate[i] = sigmoid(z_gate[i]);
             }
-
-            // TODO 3) Compute n gate - note that this is different than the r and z gates
+            
+            // Compute n gate - note that this is different than the r and z gates
             for (size_t i = 0; i < HIDDEN_SIZE; ++i)
             {
-                // TODO 3.1) Compute W_in * x + b_in and store result to n_gate
-                // TODO 3.2) Compute W_h * h + b_h and store result to n_hidden
-                // TODO 3.3) Multiply n_hidden by the r gate
-                // TODO 3.4) Add n_hidden to n_gate
-                // TODO 3.5) Apply tanh activation function to n_gate
+                // Compute W_in * x + b_in and store result to n_gate
+                n_gate[i] = bias_ih_n[i];
+                for (size_t j = 0; j < INPUT_SIZE; ++j)
+                {
+                    n_gate[i] += weight_ih_n[i][j] * input[n][j];
+                }
+                
+                // Compute W_h * h + b_h and store result to n_hidden
+                n_hidden[i] = bias_hh_n[i];
+                for (size_t j = 0; j < HIDDEN_SIZE; ++j)
+                {
+                    n_hidden[i] += weight_hh_n[i][j] * state[j];
+                }
+                
+                // Multiply n_hidden by the r gate (element-wise multiplication)
+                n_hidden[i] *= r_gate[i];
+                
+                // Add n_hidden to n_gate
+                n_gate[i] += n_hidden[i];
+                
+                // Apply tanh activation function to n_gate
+                n_gate[i] = std::tanh(n_gate[i]);
             }
-
-            // TODO 4) Compute the new state h_t = (1 - z) * n + z * h_{t-1}
+            
+            // Compute the new state h_t = (1 - z) * n + z * h_{t-1}
             for (size_t i = 0; i < HIDDEN_SIZE; ++i)
             {
+                state[i] = (1.0f - z_gate[i]) * n_gate[i] + z_gate[i] * state[i];
             }
 
-            // TODO 5) Implement the affine output layer - store final output to output[n][i]
+            // Implement the affine output layer - store final output to output[n][i]
             for (size_t i = 0; i < OUTPUT_SIZE; ++i)
             {
+                output[n][i] = bias_output[i];
+                
+                for (size_t j = 0; j < HIDDEN_SIZE; ++j)
+                {
+                    output[n][i] += weight_output[i][j] * state[j];
+                }
             }
         }
     }
